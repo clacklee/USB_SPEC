@@ -1,6 +1,6 @@
 name: Download BC1.2 Specification
 on:
-  workflow_dispatch:  # 手动触发
+  workflow_dispatch:
 
 jobs:
   download:
@@ -24,4 +24,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add ./specs/
           git diff --staged --quiet || git commit -m "Add BC1.2 specification"
+          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}
           git push
