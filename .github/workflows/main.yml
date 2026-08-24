@@ -15,14 +15,20 @@ jobs:
           mkdir -p ./specs
           wget -O ./specs/BCv1.2.zip https://www.usb.org/sites/default/files/BCv1.2_070312_0.zip
           cd ./specs
-          unzip -o BCv1.2.zip
-          rm BCv1.2.zip
+          unzip -o BCv1.2.zip || true   # 加 || true 防止因文件损坏而中断
+          rm -f BCv1.2.zip
 
       - name: Push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add ./specs/
-          git diff --staged --quiet || git commit -m "Add BC1.2 specification"
+          # 检查是否有变更
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Add BC1.2 specification"
+          # 关键：强制使用 PAT 进行推送
           git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}
           git push
